@@ -1,0 +1,16 @@
+# ==============================================================================
+# Suricata Custom Detection Rules: AI & LLM Threat Detection
+# Rule Family: LLM Data Exfiltration & Vector DB Anomalies
+# ==============================================================================
+
+alert http any any -> any 6333 (msg:"AI-THREAT Unauthorized Vector Database Bulk Dump Access"; flow:to_server,established; content:"/collections/"; http_uri; content:"/dump"; http_uri; classtype:policy-violation; sid:1000020; rev:1; metadata:mitre_attack T1530, severity critical;)
+
+alert http any any -> any 6333 (msg:"AI-THREAT Unauthorized Vector DB Schema Query"; flow:to_server,established; content:"/collections"; http_uri; classtype:policy-violation; sid:1000021; rev:1; metadata:mitre_attack T1530, severity high;)
+
+alert http any any -> any any (msg:"AI-THREAT Shadow AI Gateway - Rogue External LLM API Request"; flow:to_server,established; content:"Host: api.unauthorized-ai-proxy.org"; nocase; http_header; classtype:bad-unknown; sid:1000030; rev:1; metadata:mitre_attack T1071.001, severity medium;)
+
+alert http any any -> any 8000 (msg:"AI-THREAT High-Volume LLM Payload Exfiltration Egress Spike"; flow:to_server,established; content:"Bulk exfiltration chunk"; nocase; http_client_body; classtype:policy-violation; sid:1000040; rev:1; metadata:mitre_attack T1048.003, severity high;)
+
+alert http any any -> any 8000 (msg:"AI-THREAT High-Volume LLM Payload Exfiltration Egress Spike"; flow:to_server,established; content:"Exfiltration"; nocase; http_client_body; classtype:policy-violation; sid:1000041; rev:1; metadata:mitre_attack T1048.003, severity high;)
+
+alert http any any -> any 8000 (msg:"AI-THREAT High-Volume LLM Payload Exfiltration Egress Spike"; flow:to_server,established; content:"Exfil:"; nocase; http_client_body; classtype:policy-violation; sid:1000042; rev:1; metadata:mitre_attack T1048.003, severity high;)

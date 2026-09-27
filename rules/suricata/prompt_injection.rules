@@ -1,0 +1,12 @@
+# ==============================================================================
+# Suricata Custom Detection Rules: AI & LLM Threat Detection
+# Rule Family: Prompt Injection & Adversarial Payloads
+# ==============================================================================
+
+alert http any any -> any 8000 (msg:"AI-THREAT Direct Prompt Injection - System Prompt Override Attempt"; flow:to_server,established; content:"Ignore previous instructions"; nocase; http_client_body; classtype:attempted-admin; sid:1000001; rev:1; metadata:mitre_attack T1059.006, severity critical;)
+
+alert http any any -> any 8000 (msg:"AI-THREAT Adversarial Jailbreak - DAN / Developer Mode Bypass"; flow:to_server,established; content:"DAN Mode enabled"; nocase; http_client_body; classtype:attempted-admin; sid:1000002; rev:1; metadata:mitre_attack T1059.006, severity critical;)
+
+alert http any any -> any 8000 (msg:"AI-THREAT Credential Harvester - AWS / API Key Exfiltration in Prompt"; flow:to_server,established; content:"AWS_SECRET_ACCESS_KEY"; nocase; http_client_body; classtype:attempted-admin; sid:1000003; rev:1; metadata:mitre_attack T1552.001, severity critical;)
+
+alert http any any -> any 8000 (msg:"AI-THREAT Prompt Injection - System Prompt Dump Request"; flow:to_server,established; content:"dump your system prompt"; nocase; http_client_body; classtype:attempted-admin; sid:1000004; rev:1; metadata:mitre_attack T1059.006, severity high;)

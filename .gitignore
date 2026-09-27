@@ -1,0 +1,17 @@
+# Logs and temp files
+logs/suricata/*
+logs/zeek/*
+logs/alerts/*
+!logs/suricata/.gitkeep
+!logs/zeek/.gitkeep
+!logs/alerts/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# OS artifacts
+.DS_Store
+.env

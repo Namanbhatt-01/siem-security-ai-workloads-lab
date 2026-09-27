@@ -1,0 +1,132 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.11.1
+    container_name: lab3_opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx768m"
+      - bootstrap.memory_lock=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    networks:
+      lab3_net:
+        ipv4_address: 172.28.0.10
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  mock_llm_service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mock_llm
+    container_name: lab3_mock_llm
+    ports:
+      - "8000:8000"
+      - "6333:6333"
+    networks:
+      lab3_net:
+        ipv4_address: 172.28.0.20
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 3s
+
+  webhook_receiver:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.webhook
+    container_name: lab3_webhook_receiver
+    ports:
+      - "9090:9090"
+    networks:
+      lab3_net:
+        ipv4_address: 172.28.0.30
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:9090/health')\""]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 3s
+
+  suricata:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.suricata
+    container_name: lab3_suricata
+    network_mode: "service:mock_llm_service"
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE
+      - NET_RAW
+    volumes:
+      - ./rules/suricata:/var/lib/suricata/rules:ro
+      - ./config/suricata/suricata.yaml:/etc/suricata/suricata.yaml:ro
+      - ./logs/suricata:/var/log/suricata
+    restart: unless-stopped
+    depends_on:
+      mock_llm_service:
+        condition: service_healthy
+
+  zeek:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.zeek
+    container_name: lab3_zeek
+    network_mode: "service:mock_llm_service"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./scripts/zeek:/usr/local/zeek/share/zeek/site/custom:ro
+      - ./logs/zeek:/var/log/zeek
+    restart: unless-stopped
+    depends_on:
+      mock_llm_service:
+        condition: service_healthy
+
+  siem_pipeline:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.siem
+    container_name: lab3_siem_engine
+    environment:
+      - OPENSEARCH_URL=http://172.28.0.10:9200
+      - WEBHOOK_URL=http://172.28.0.30:9090/alerts
+      - SURICATA_EVE_PATH=/var/log/suricata/eve.json
+      - ZEEK_LOG_DIR=/var/log/zeek
+      - RULES_PATH=/app/rules/wazuh_opensearch/rules.json
+    volumes:
+      - ./rules:/app/rules:ro
+      - ./logs/suricata:/var/log/suricata
+      - ./logs/zeek:/var/log/zeek
+      - ./logs/alerts:/var/log/alerts
+    networks:
+      lab3_net:
+        ipv4_address: 172.28.0.40
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      webhook_receiver:
+        condition: service_healthy
+
+networks:
+  lab3_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1

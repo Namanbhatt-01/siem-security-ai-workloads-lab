@@ -1,0 +1,55 @@
+<group name="ai_security,prompt_injection,llm_exfiltration,">
+
+  <!-- Rule 100101: Prompt Injection & Jailbreak Attack -->
+  <rule id="100101" level="12">
+    <if_group>suricata</if_group>
+    <field name="alert.signature_id">^100000[1-4]$</field>
+    <description>AI Workload Security: Adversarial Prompt Injection / System Prompt Override detected against LLM Gateway</description>
+    <mitre>
+      <id>T1059.006</id>
+      <tactic>Execution</tactic>
+      <technique>Command and Scripting Interpreter: Python / Prompt Injection</technique>
+    </mitre>
+    <group>ai_prompt_injection,pci_dss_10.6.1,nist_800_53_SI.4</group>
+  </rule>
+
+  <!-- Rule 100102: High-Volume LLM Payload Exfiltration -->
+  <rule id="100102" level="10">
+    <if_group>suricata</if_group>
+    <field name="alert.signature_id">^1000040$</field>
+    <description>AI Workload Security: High-Volume LLM Token &amp; Weight Exfiltration Egress Spike detected</description>
+    <mitre>
+      <id>T1048.003</id>
+      <tactic>Exfiltration</tactic>
+      <technique>Exfiltration Over Alternative Protocol: Unencrypted Web Egress</technique>
+    </mitre>
+    <group>ai_data_exfiltration,pci_dss_10.6.1,gdpr_IV_32.1.b</group>
+  </rule>
+
+  <!-- Rule 100103: Unauthorized Vector Database Harvest -->
+  <rule id="100103" level="12">
+    <if_group>suricata</if_group>
+    <field name="alert.signature_id">^100002[0-1]$</field>
+    <description>AI Workload Security: Unauthorized Vector Database (Qdrant/Milvus) bulk dump or schema extraction attempt</description>
+    <mitre>
+      <id>T1530</id>
+      <tactic>Collection</tactic>
+      <technique>Data from Cloud / Local Vector Storage</technique>
+    </mitre>
+    <group>ai_vector_db_threat,hipaa_164.312.b</group>
+  </rule>
+
+  <!-- Rule 100104: Rogue External LLM API Request -->
+  <rule id="100104" level="8">
+    <if_group>suricata</if_group>
+    <field name="alert.signature_id">^1000030$</field>
+    <description>AI Workload Security: Shadow AI API Call to Unapproved External Model Endpoint</description>
+    <mitre>
+      <id>T1071.001</id>
+      <tactic>Command and Control</tactic>
+      <technique>Application Layer Protocol: Web Protocols</technique>
+    </mitre>
+    <group>ai_shadow_it,pci_dss_1.3.1</group>
+  </rule>
+
+</group>

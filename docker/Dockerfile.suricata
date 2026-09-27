@@ -1,0 +1,4 @@
+FROM jasonish/suricata:7.0.2
+
+ENTRYPOINT ["suricata"]
+CMD ["-i", "eth0", "-v", "-c", "/etc/suricata/suricata.yaml"]

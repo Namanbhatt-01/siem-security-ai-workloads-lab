@@ -1,0 +1,54 @@
+[
+  {
+    "rule_id": 100101,
+    "level": 12,
+    "severity": "CRITICAL",
+    "name": "AI_PROMPT_INJECTION_OVERRIDE",
+    "description": "Adversarial Prompt Injection / System Prompt Override detected against LLM Gateway",
+    "mitre_attack_id": "T1059.006",
+    "mitre_tactic": "Execution",
+    "mitre_technique": "Command and Scripting Interpreter: Prompt Injection",
+    "matching_signatures": [1000001, 1000002, 1000003, 1000004],
+    "auto_webhook_dispatch": true,
+    "sla_seconds": 10
+  },
+  {
+    "rule_id": 100102,
+    "level": 10,
+    "severity": "HIGH",
+    "name": "AI_LLM_HIGH_VOLUME_EXFILTRATION",
+    "description": "High-Volume LLM Token & Weight Exfiltration Egress Spike detected",
+    "mitre_attack_id": "T1048.003",
+    "mitre_tactic": "Exfiltration",
+    "mitre_technique": "Exfiltration Over Alternative Protocol: Unencrypted Web Egress",
+    "matching_signatures": [1000040, 1000041, 1000042],
+    "auto_webhook_dispatch": true,
+    "sla_seconds": 10
+  },
+  {
+    "rule_id": 100103,
+    "level": 12,
+    "severity": "CRITICAL",
+    "name": "AI_VECTOR_DB_UNAUTHORIZED_HARVEST",
+    "description": "Unauthorized Vector Database (Qdrant/Milvus) bulk dump or schema extraction attempt",
+    "mitre_attack_id": "T1530",
+    "mitre_tactic": "Collection",
+    "mitre_technique": "Data from Cloud / Local Vector Storage",
+    "matching_signatures": [1000020, 1000021],
+    "auto_webhook_dispatch": true,
+    "sla_seconds": 10
+  },
+  {
+    "rule_id": 100104,
+    "level": 8,
+    "severity": "MEDIUM",
+    "name": "AI_SHADOW_LLM_GATEWAY_EGRESS",
+    "description": "Shadow AI API Call to Unapproved External Model Endpoint",
+    "mitre_attack_id": "T1071.001",
+    "mitre_tactic": "Command and Control",
+    "mitre_technique": "Application Layer Protocol: Web Protocols",
+    "matching_signatures": [1000030],
+    "auto_webhook_dispatch": true,
+    "sla_seconds": 10
+  }
+]
