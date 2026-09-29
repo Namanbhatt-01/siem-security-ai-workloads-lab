@@ -1,0 +1,33 @@
+id: AI-EXFIL-001
+name: Unusual Vector Database Bulk Egress Flow
+severity: high
+confidence: high
+status: active
+author: "AI Infrastructure SecOps Engineering"
+description: >
+  Detects anomalous volumetric data exfiltration originating from internal vector database clusters (Qdrant/Milvus)
+  destined for external or untrusted network endpoints.
+data_sources:
+  - zeek.conn
+  - suricata.eve
+logic:
+  condition: >
+    source_ip == VECTOR_DB_CLUSTER and
+    destination_port in [6333, 6334, 19530] and
+    flow_duration_seconds < 10 and
+    bytes_transferred > 50000000 and
+    dest_ip not in TRUSTED_AI_WORKER_SUBNETS
+false_positives:
+  - Scheduled nightly cross-region vector index replication (authorized batch jobs).
+  - High-throughput benchmark evaluations executed in isolated staging namespaces.
+mitigation:
+  - Enforce egress security groups isolating vector DB namespaces.
+  - Automatically drop untrusted TCP connections via Suricata inline IPS mode.
+test_cases:
+  - id: TC-EXFIL-01
+    name: Rapid 100MB Vector Egress via Unauthorized Host
+    input_event:
+      src_ip: "172.28.0.5"
+      dst_ip: "198.51.100.42"
+      bytes_out: 104857600
+    expected_result: alert_generated
