@@ -105,13 +105,21 @@ make up
 
 ---
 
-## 6. Known Limitations
+## 6. Threat Research & Malware Forensics
+
+- **Track 1C — Sample Forensics & Provenance Evidence Sheet**: [`docs/track1c_sample_forensics_evidence_sheet.md`](docs/track1c_sample_forensics_evidence_sheet.md)  
+  *Architectural continuity analysis comparing the 9-sample candidate corpus across GITSHELLPAD (Golang) and RUSTYSHADE (Rust) implants using GitHub private repository file-as-protocol C2 channels.*
+
+---
+
+## 7. Known Limitations
 
 1. **Cleartext Inspection Boundary**: Network-layer prompt injection detection requires TLS termination at an ingress reverse proxy (or eBPF uprobes); end-to-end encrypted HTTPS traffic cannot be inspected by raw packet sniffers without intermediate decryption.
 2. **Detection Logic Format**: Rules are implemented as YAML specifications evaluated by the Python test engine; production deployments would translate these rules into Sigma / Suricata `.rules` / ElastAlert / OpenSearch Query DSL.
 
 ---
 
-## 7. License
+## 8. License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
